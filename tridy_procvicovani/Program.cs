@@ -10,108 +10,109 @@ namespace tridy_procvicovani
     {
         static void Main(string[] args)
         {
-
-
-            /*Třída Student
-            Atributy: Jméno (string), PrůměrnáZnámka (double)
-             Metody: ZobrazInfo() , která vypíše jméno a průměrnou známku. 
-            Přidej metodu KontrolaPrumeru() , která zkontroluje, jestli student má průměrnou 
-            známku vyšší než 2.0.
-             */
-
-            //(Kdyby array objektů)
-            //TODO:
-            //-uživatel zadává jména a známky
-            //-průměr vychází z několika známek (array, list - (rozdíl - array má ststický počet prvků))
-            //ukázat TRY CATCH FINALLY
-            //ukázat vytvoření list
-            //ukázat STATIC + přidělení více studentů
-
             Console.WriteLine("Zadejte jméno studenta:");
-            Student s1 = new Student(); //implicitní konstruktor?
+            Student s1 = new Student(); // implicitní konstruktor
             s1.Jmeno = Console.ReadLine();
-            Student s2 = new Student();
-            Student s3 = new Student();
 
-            Console.WriteLine("Zadejte 5 známek:");
-            
-            try //zkusím jestli rizikový kód funguje
+            Student s2 = new Student();
+            Console.WriteLine("Zadejte jméno druhého studenta:");
+            s2.Jmeno = Console.ReadLine();
+
+            Student s3 = new Student();
+            Console.WriteLine("Zadejte jméno třetího studenta:");
+            s3.Jmeno = Console.ReadLine();
+
+            s1.kontrolaPrumeru();
+            s2.kontrolaPrumeru();
+            s3.kontrolaPrumeru();
+
+
+            Console.WriteLine("Počet studentů: " + Student.seznamStudentu);
+
+            // Zavolání metody pro zobrazení všech studentů
+            Student.ZobrazVsechnyStudenty();
+
+            // Možnost upravit známky
+            Console.WriteLine("Zadejte jméno studenta, kterému chcete upravit známky: ");
+
+            string hledJmeno = Console.ReadLine();
+
+            Student uprStudent = Student.seznamVsechStudentu.FirstOrDefault(s => s.Jmeno == hledJmeno);
+
+            if (uprStudent != null)
             {
-                //rizikový kód
+                uprStudent.UpravZnamky();
+            }
+            else
+            {
+                Console.WriteLine("Student nenalezen.");
+            }
+
+            Console.ReadKey();
+        }
+    }
+
+    public class Student
+    {
+        // Atributy
+        public string Jmeno;
+        public double PrumernaZnamka;
+        public List<int> znamky = new List<int>();
+
+        // Statická proměnná pro počet studentů
+        public static int seznamStudentu;
+
+        // Statický seznam pro uchování všech studentů
+        public static List<Student> seznamVsechStudentu = new List<Student>();
+
+        public Student()
+        {
+            seznamStudentu++;
+            seznamVsechStudentu.Add(this);
+        }
+
+        public void PridatZnamku(int znamka)
+        {
+            Console.WriteLine("Zadejte 5 známek:");
+            try
+            {
                 for (int i = 0; i < 5; i++)
                 {
-
-                    s1.znamky.Add(Convert.ToInt32(Console.ReadLine()));
-
+                    znamky.Add(Convert.ToInt32(Console.ReadLine()));
                 }
             }
-            catch (FormatException e)
+            catch (FormatException)
             {
                 Console.WriteLine("Chyba formátování");
             }
-            catch (Exception e)
+            catch (Exception)
             {
-
-                Console.WriteLine("Něco se pokzilo");
-
+                Console.WriteLine("Něco se pokazilo");
             }
             finally
             {
                 Console.WriteLine("Program bude ukončen");
             }
-
-            //Console.WriteLine(s1.seznamStudentu);
-
-            
-            s1.kontrolaPrumeru();
-            Console.WriteLine( "Počet studentů" + Student.seznamStudentu);
-            Console.ReadKey();
-            //TODO:
-            //přidáním známky přepište na vlastní metodu(v rámci třídy) class student - > přidat metodu která bude přidávat známky
-            //-přidejte metodu, která zobrazuje jména všech studentů
-            //- přidejte metodu, která bude známky upravovat (mazat, editovat,...)
-
-
-
-            /*
-          Student s1 = new Student("Lukáš", 1.5); 
-          Student s2 = new Student("Adík", 2.3);
-          Student s3 = new Student("Petr", 1.2);
-          s1.kontrolaPrumeru();
-          s2.kontrolaPrumeru();
-          s3.kontrolaPrumeru();
-            */
         }
-    }
-    public class Student
-    {
-        //atributy
-        public string Jmeno;
-        public double PrumernaZnamka;
-        public List<int> znamky;
-        //static = vztahocě nezávislá, nezodpovídá se ničemu nadřazenému
-        public static int seznamStudentu;
-        public Student() 
-        { 
-            znamky = new List<int>();
-            seznamStudentu++;
-        }
-       
-        //metody
-        //zobraz informace; kontrola prumeru
 
+        // Metoda pro zobrazení informací o studentovi
         public void ZobrazInfo()
         {
-            Console.WriteLine("Jmeno stuenta: " + Jmeno + "\nJeho prumer: " + PrumernaZnamka);
-
+            Console.WriteLine("Jméno studenta: " + Jmeno + "\nJeho průměr: " + PrumernaZnamka);
         }
 
         public void kontrolaPrumeru()
         {
+            if (znamky.Count == 0)
+            {
+                Console.WriteLine("Žádné známky nebyly zadány.");
+                return;
+            }
+
             double prumer = znamky.Average();
             try
             {
-                if (prumer <  1.5)
+                if (prumer < 1.5)
                 {
                     Console.WriteLine("Nárok na stipendium");
                 }
@@ -120,14 +121,99 @@ namespace tridy_procvicovani
                     Console.WriteLine("Nemá nárok na stipendium");
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-
-                Console.WriteLine(  "něco se pokazilo");
+                Console.WriteLine("Něco se pokazilo");
             }
-            
-            Console.ReadKey();
         }
-        
+
+        // Metoda pro zobrazení jmen všech studentů
+        public static void ZobrazVsechnyStudenty()
+        {
+            Console.WriteLine("Seznam všech studentů:");
+            foreach (var student in seznamVsechStudentu)
+            {
+                Console.WriteLine(student.Jmeno);
+            }
+        }
+
+        // Nová metoda pro úpravu známek (mazání, editace)
+        public void UpravZnamky()
+        {
+            if (znamky.Count == 0)
+            {
+                Console.WriteLine("Tento student nemá žádné známky k úpravě.");
+                return;
+            }
+
+            while (true)
+            {
+                Console.WriteLine("\nAktuální známky studenta " + Jmeno + ": " + string.Join(", ", znamky));
+                Console.WriteLine("Vyberte akci:");
+                Console.WriteLine("1 - Smazat známku");
+                Console.WriteLine("2 - Upravit známku");
+                Console.WriteLine("3 - Přidat novou známku");
+                Console.WriteLine("4 - Ukončit úpravy");
+                string volba = Console.ReadLine();
+
+                switch (volba)
+                {
+                    case "1":
+                        Console.WriteLine("Zadejte index známky k odstranění (0-" + (znamky.Count - 1) + "):");
+                        if (int.TryParse(Console.ReadLine(), out int indexSmazani) && indexSmazani >= 0 && indexSmazani < znamky.Count)
+                        {
+                            znamky.RemoveAt(indexSmazani);
+                            Console.WriteLine("Známka byla odstraněna.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Neplatný index.");
+                        }
+                        break;
+
+                    case "2":
+                        Console.WriteLine("Zadejte index známky k úpravě (0-" + (znamky.Count - 1) + "):");
+                        if (int.TryParse(Console.ReadLine(), out int indexUpravy) && indexUpravy >= 0 && indexUpravy < znamky.Count)
+                        {
+                            Console.WriteLine("Zadejte novou hodnotu známky:");
+                            if (int.TryParse(Console.ReadLine(), out int novaZnamka))
+                            {
+                                znamky[indexUpravy] = novaZnamka;
+                                Console.WriteLine("Známka byla upravena.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Neplatná hodnota.");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Neplatný index.");
+                        }
+                        break;
+
+                    case "3":
+                        Console.WriteLine("Zadejte novou známku:");
+                        if (int.TryParse(Console.ReadLine(), out int novaZnamkaPridat))
+                        {
+                            znamky.Add(novaZnamkaPridat);
+                            Console.WriteLine("Známka byla přidána.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Neplatná hodnota.");
+                        }
+                        break;
+
+                    case "4":
+                        Console.WriteLine("Úpravy ukončeny.");
+                        return;
+
+                    default:
+                        Console.WriteLine("Neplatná volba.");
+                        break;
+                }
+            }
+        }
     }
 }
