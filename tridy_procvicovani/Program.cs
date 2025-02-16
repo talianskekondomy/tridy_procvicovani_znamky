@@ -10,26 +10,31 @@ namespace tridy_procvicovani
         static void Main(string[] args)
         {
            
+           
             Console.WriteLine("Zadejte jméno studenta:");
-            Student s1 = new Student(); //implicitní konstruktor?
+            Student s1 = new Student(); //implicitní konstruktor
             s1.Jmeno = Console.ReadLine();
             Student s2 = new Student();
             Student s3 = new Student();
-            Console.WriteLine("Zadejte 5 známek:");
 
+            Console.WriteLine("Zadejte 5 známek:");
             s1.ZadejZnamky();
             s1.kontrolaPrumeru();
-            Console.WriteLine("Počet studentů" + Student.seznamStudentu);
+
+
+            Student.ZobrazPrumerVsechStudentu();
+            Student.KontrolaPoctuStudentu();
+
+            Console.WriteLine("Chcete smazat a zadat nové známky? (ano/ne)");
+            if (Console.ReadLine().ToLower() == "ano")
+            {
+                s1.ObnovZnamky();
+                s1.kontrolaPrumeru();
+            }
+
             Console.ReadKey();
 
-      /*
-          Student s1 = new Student("Lukáš", 1.5); 
-          Student s2 = new Student("Adík", 2.3);
-          Student s3 = new Student("Petr", 1.2);
-          s1.kontrolaPrumeru();
-          s2.kontrolaPrumeru();
-          s3.kontrolaPrumeru();
-            */
+  
         }
     }
     public class Student
@@ -62,6 +67,12 @@ namespace tridy_procvicovani
            
             try
             {
+                if (znamky.Count == 0)
+                {
+                    Console.WriteLine("Žádné známky nebyly zadány. Nelze vypočítat průměr.");
+                    return;
+                }
+
                 double prumer = znamky.Average();
                 if (prumer < 1.5)
                 {
@@ -82,20 +93,29 @@ namespace tridy_procvicovani
         }
          public void ZadejZnamky()
         {
-            Console.WriteLine("Zadejte 5 známek");
             try
             {
                 for (int i = 0; i < 5; i++)
                 {
-                    znamky.Add(Convert.ToInt32(Console.ReadLine()));
+                    int znamka;
+                    do
+                    {
+                        Console.Write($"Zadejte známku {i + 1} (1-5): ");
+                        znamka = Convert.ToInt32(Console.ReadLine());
+
+                        if (znamka < 1 || znamka > 5)
+                        {
+                            Console.WriteLine("Neplatná známka! Zadejte číslo mezi 1 a 5.");
+                        }
+                    } while (znamka < 1 || znamka > 5);
+
+                    znamky.Add(znamka);
                 }
             }
             catch (Exception e)
             {
-
-                Console.WriteLine("Chyba: " + e.Message); ;
+                Console.WriteLine("Chyba při zadávání známek: " + e.Message);
             }
-
         }
         public static void ZobrazVsechnyy()
         {
@@ -111,5 +131,64 @@ namespace tridy_procvicovani
             znamky.Clear();
             Console.WriteLine( "Všechny známky byly smazány");
         }
+
+        public void ObnovZnamky()
+        {
+            MazatZnamky();
+            Console.WriteLine("Zadejte nové známky:");
+            ZadejZnamky();
+        }
+
+        public static void KontrolaPoctuStudentu()
+        {
+            if (pocetStudentu == 0)
+            {
+                Console.WriteLine("V systému není žádný student.");
+            }
+            else
+            {
+                Console.WriteLine("Počet studentů: " + pocetStudentu);
+            }
+        }
+
+
+        public static void ZobrazPrumerVsechStudentu()
+        {
+            if (seznamStudentu.Count == 0)
+            {
+                Console.WriteLine("Žádní studenti nejsou k dispozici.");
+                return;
+            }
+
+            double soucetPrumeru = 0;
+            int pocetStudentuSeZnamkami = 0;
+
+            Console.WriteLine("\n Průměrné známky jednotlivých studentů:");
+            foreach (var student in seznamStudentu)
+            {
+                if (student.znamky.Count > 0)
+                {
+                    double prumer = student.znamky.Average();
+                    Console.WriteLine($" {student.Jmeno}: {prumer:F2}");
+                    soucetPrumeru += prumer;
+                    pocetStudentuSeZnamkami++;
+                }
+                else
+                {
+                    Console.WriteLine($" {student.Jmeno} zatím nemá žádné známky.");
+                }
+            }
+
+            if (pocetStudentuSeZnamkami > 0)
+            {
+                double celkovyPrumer = soucetPrumeru / pocetStudentuSeZnamkami;
+                Console.WriteLine($"\n Celkový průměr všech studentů: {celkovyPrumer:F2}");
+            }
+            else
+            {
+                Console.WriteLine("\n Žádný student zatím nemá zadané známky, nelze spočítat průměr.");
+            }
+        }
+
     }
 }
